@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Keylogger Monitor</title>
+
+    <!-- Compatible Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial,Helvetica,sans-serif;
+            background:#eef2f7;
+        }
+
+        .container{
+            width:90%;
+            max-width:900px;
+            margin:40px auto;
+            background:white;
+            border-radius:10px;
+            padding:25px;
+            box-shadow:0 5px 15px rgba(0,0,0,.15);
+        }
+
+        h1{
+            text-align:center;
+            color:#2c3e50;
+            margin-bottom:20px;
+        }
+
+        #status{
+            text-align:center;
+            font-weight:bold;
+            margin-bottom:15px;
+            color:#0066cc;
+        }
+
+        #logs{
+            height:450px;
+            overflow-y:auto;
+            border:1px solid #ddd;
+            background:#fafafa;
+            padding:15px;
+            border-radius:8px;
+        }
+
+        .log{
+            background:white;
+            border-left:5px solid #3498db;
+            padding:10px;
+            margin-bottom:10px;
+            border-radius:5px;
+            font-family:Consolas, monospace;
+            word-wrap:break-word;
+        }
+
+        .connected{
+            color:green;
+        }
+
+        .disconnected{
+            color:red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Real-Time Keylogger Monitor</h1>
+
+    <div id="status">
+        Connecting...
+    </div>
+
+    <div id="logs">
+
+    </div>
+
+</div>
+
+<script>
+
+const status=document.getElementById("status");
+const logs=document.getElementById("logs");
+
+// Automatically connect to the same server that served the page
+const socket=io({
+    transports:["websocket","polling"]
+});
+
+socket.on("connect",()=>{
+
+    status.innerHTML="🟢 Connected";
+    status.className="connected";
+
+    console.log("Connected");
+
+});
+
+socket.on("disconnect",()=>{
+
+    status.innerHTML="🔴 Disconnected";
+    status.className="disconnected";
+
+    console.log("Disconnected");
+
+});
+
+socket.on("connect_error",(err)=>{
+
+    console.log(err);
+
+});
+
+socket.on("new_log",(msg)=>{
+
+    const div=document.createElement("div");
+
+    div.className="log";
+
+    div.textContent=msg.data;
+
+    logs.appendChild(div);
+
+    logs.scrollTop=logs.scrollHeight;
+
+});
+
+</script>
+
+</body>
+</html>
